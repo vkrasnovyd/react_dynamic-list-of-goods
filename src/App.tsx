@@ -7,6 +7,15 @@ import { Good } from './types/Good';
 
 export const App: React.FC = () => {
   const [goods, setGoods] = useState<Good[]>([]);
+  const [error, setError] = useState('');
+
+  const fetchGoods = (fetchingFn: () => Promise<Good[]>) => {
+    setError('');
+
+    fetchingFn()
+      .then(setGoods)
+      .catch(e => setError(e));
+  };
 
   return (
     <div className="App">
@@ -15,12 +24,7 @@ export const App: React.FC = () => {
       <button
         type="button"
         data-cy="all-button"
-        onClick={() => {
-          getAll()
-            .then(setGoods)
-            // eslint-disable-next-line no-console
-            .catch(error => console.log(error));
-        }}
+        onClick={() => fetchGoods(getAll)}
       >
         Load all goods
       </button>
@@ -28,12 +32,7 @@ export const App: React.FC = () => {
       <button
         type="button"
         data-cy="first-five-button"
-        onClick={() => {
-          get5First()
-            .then(setGoods)
-            // eslint-disable-next-line no-console
-            .catch(error => console.log(error));
-        }}
+        onClick={() => fetchGoods(get5First)}
       >
         Load 5 first goods
       </button>
@@ -41,17 +40,12 @@ export const App: React.FC = () => {
       <button
         type="button"
         data-cy="red-button"
-        onClick={() => {
-          getRedGoods()
-            .then(setGoods)
-            // eslint-disable-next-line no-console
-            .catch(error => console.log(error));
-        }}
+        onClick={() => fetchGoods(getRedGoods)}
       >
         Load red goods
       </button>
 
-      <GoodsList goods={goods} />
+      {error ? <p>{error}</p> : <GoodsList goods={goods} />}
     </div>
   );
 };
